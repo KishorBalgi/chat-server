@@ -1,64 +1,51 @@
 const User = require('../models/user');
 const bcrypt = require('bcrypt');
 const AuthFeatures = require('../utils/authFeatures');
-
-exports.signup = async (req, res) => {
-  try {
-    const data = {
-      name: req.body.name,
-      email: req.body.email,
-      createdAt: req.body.createdAt,
-      password: await bcrypt.hash(req.body.password, await bcrypt.genSalt(5)),
-      img: 'https://i.ibb.co/d5RgxfH/user-blank.png',
-    };
-    const user = await User.create(data);
-    res.status(200).json({
-      status: 'success',
-      user: { uid: user._id, img: user.img },
-      message: 'Account created successfully.',
-    });
-  } catch (err) {
-    res.status(400).json({
-      status: 'fail',
-      message: err,
-    });
-  }
+const AppError = require('../utils/appErrors');
+const catchAsync = (fn) => {
+  return (req, res, next) => fn(req, res, next).catch(next);
 };
+exports.signup = catchAsync(async (req, res, next) => {
+  const data = {
+    name: req.body.name,
+    email: req.body.email,
+    createdAt: req.body.createdAt,
+    password: await bcrypt.hash(req.body.password, await bcrypt.genSalt(5)),
+    img: 'https://i.ibb.co/d5RgxfH/user-blank.png',
+  };
 
-exports.login = async (req, res) => {
-  try {
-    const user = new AuthFeatures(User.find(), req.body).find();
-    const userArr = await user.users;
-    const userData = userArr[0];
-    if (!userData) {
-      throw 'Invalid E-Mail.';
+  const user = await User.create(data, (err, user) => {
+    if (err) return next(new AppError('Email already taken', 400));
+    else {
+      res.status(200).json({
+        status: 'success',
+        user: { uid: user._id, img: user.img },
+        message: 'Account created successfully.',
+      });
     }
-    await bcrypt.compare(
-      req.body.password,
-      userData.password,
-      (err, isTrue) => {
-        if (isTrue) {
-          res.status(200).json({
-            status: 'success',
-            message: 'Verified successfully.',
-            user: {
-              name: userData.name,
-              img: userData.img,
-              uid: userData._id,
-            },
-          });
-        } else {
-          res.status(400).json({
-            status: 'fail',
-            message: 'Invalid Password.',
-          });
-        }
-      }
-    );
-  } catch (err) {
-    res.status(400).json({
-      status: 'fail',
-      message: err,
-    });
+  });
+});
+
+exports.login = catchAsync(async (req, res, next) => {
+  const user = new AuthFeatures(User.find(), req.body).find();
+  const userArr = await user.users;
+  const userData = userArr[0];
+  if (!userData) {
+    return next(new AppError('Invalid E-Mail', 400));
   }
-};
+  await bcrypt.compare(req.body.password, userData.password, (err, isTrue) => {
+    if (isTrue) {
+      res.status(200).json({
+        status: 'success',
+        message: 'Verified successfully.',
+        user: {
+          name: userData.name,
+          img: userData.img,
+          uid: userData._id,
+        },
+      });
+    } else {
+      return next(new AppError('Invalid Password', 400));
+    }
+  });
+});
