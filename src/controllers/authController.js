@@ -13,10 +13,11 @@ exports.signup = catchAsync(async (req, res, next) => {
     password: await bcrypt.hash(req.body.password, await bcrypt.genSalt(5)),
     img: 'https://i.ibb.co/d5RgxfH/user-blank.png',
   };
-
-  const user = await User.create(data, (err, user) => {
-    if (err) return next(new AppError('Email already taken', 400));
-    else {
+  await User.create(data, (err, user) => {
+    if (err) {
+      if (err.code === 11000)
+        return next(new AppError('Email already taken', 400));
+    } else {
       res.status(200).json({
         status: 'success',
         user: { uid: user._id, img: user.img },
