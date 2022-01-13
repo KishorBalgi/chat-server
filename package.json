@@ -4,6 +4,7 @@
   "description": "Chat application",
   "main": "app.js",
   "scripts": {
+    "start:prod":"node server.js NODE_ENV=production",
     "start": "node server.js"
   },
   "repository": {
