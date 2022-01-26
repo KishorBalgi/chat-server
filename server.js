@@ -8,7 +8,6 @@ process.on('uncaughtException', (err) => {
   process.exit(1);
 });
 // Config.env:
-console.log(y);
 dotenv.config({ path: './config.env' });
 const PORT = process.env.PORT;
 // DB:
