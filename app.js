@@ -22,6 +22,7 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
+const cors = require('cors');
 // Middlewares:
 // HTTP Headers:
 app.use(helmet());
@@ -39,14 +40,9 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 // CORS:
-app.use(function (req, res, next) {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header(
-    'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept'
-  );
-  next();
-});
+app.use(cors());
+app.options('*', cors());
+
 app.use(express.json());
 
 app.get('/api/v1/chatlist', (req, res) => {
