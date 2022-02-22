@@ -25,7 +25,11 @@ const sendToken = (user, statusCode, res) => {
   res.cookie('jwt', token, cookieOps);
   res.status(statusCode).json({
     status: 'success',
-    data: user,
+    data: {
+      email: user.email,
+      username: user.name,
+      img: user,
+    },
   });
 };
 
@@ -87,7 +91,7 @@ exports.login = catchAsync(async (req, res, next) => {
   }
   const user = await User.findOne({ email: email }).select('+password');
   if (!user || !(await user.checkPassword(password, user.password))) {
-    return next(new AppError('Envalid E-mail or Password', 401));
+    return next(new AppError('Invalid E-mail or Password', 401));
   }
   sendToken(user, 200, res);
 });
