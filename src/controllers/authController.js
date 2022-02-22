@@ -28,7 +28,7 @@ const sendToken = (user, statusCode, res) => {
     user: {
       email: user.email,
       username: user.name,
-      img: user,
+      img: user.img,
     },
   });
 };
