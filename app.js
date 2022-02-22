@@ -22,12 +22,22 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
-const cors = require('cors');
+// const cors = require('cors');
 const compression = require('compression');
 // Middlewares:
 // CORS:
-app.use(cors());
-app.options('*', cors());
+// app.use(cors());
+// app.options('*', cors());
+app.use(function (req, res, next) {
+  //Enabling CORS
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET,HEAD,OPTIONS,POST,PUT');
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept, x-client-key, x-client-token, x-client-secret, Authorization'
+  );
+  next();
+});
 // Trust proxies:
 app.enable('trust proxy');
 // HTTP Headers:
