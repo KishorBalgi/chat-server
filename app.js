@@ -23,7 +23,10 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
 const cors = require('cors');
+const compression = require('compression');
 // Middlewares:
+// Trust proxies:
+app.enable('trust proxy');
 // HTTP Headers:
 app.use(helmet());
 // Data sanitization against NoSQL query injection:
@@ -42,8 +45,18 @@ app.use('/api', limiter);
 // CORS:
 app.use(cors());
 app.options('*', cors());
-
+// Compress responses:
+app.use(compression());
+// JSON:
 app.use(express.json());
+// CSP:
+app.use((req, res, next) => {
+  res.setHeader(
+    'Content-Security-Policy',
+    "default-src 'self' *; font-src 'self' *; img-src 'self' *; script-src 'self' *; style-src 'self' *; frame-src 'self' *"
+  );
+  next();
+});
 
 app.get('/api/v1/chatlist', (req, res) => {
   res.json(chatlistObj);
