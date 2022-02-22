@@ -25,7 +25,7 @@ const sendToken = (user, statusCode, res) => {
   res.cookie('jwt', token, cookieOps);
   res.status(statusCode).json({
     status: 'success',
-    data: {
+    user: {
       email: user.email,
       username: user.name,
       img: user,
