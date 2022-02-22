@@ -27,6 +27,9 @@ const compression = require('compression');
 // Middlewares:
 // Trust proxies:
 app.enable('trust proxy');
+// CORS:
+app.use(cors());
+app.options('*', cors());
 // HTTP Headers:
 app.use(helmet());
 // Data sanitization against NoSQL query injection:
@@ -42,9 +45,6 @@ const limiter = rateLimit({
   message: 'Too many requests, try again after an hour',
 });
 app.use('/api', limiter);
-// CORS:
-app.use(cors());
-app.options('*', cors());
 // Compress responses:
 app.use(compression());
 // JSON:
