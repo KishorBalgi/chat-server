@@ -27,9 +27,13 @@ const cors = require('cors');
 const compression = require('compression');
 // Middlewares:
 // CORS:
+var corsOrigin = 'http://localhost:3000';
+if (process.env.NODE_ENV === 'production') {
+  corsOrigin = 'https://chat-box-app-client.herokuapp.com/';
+}
 app.use(
   cors({
-    origin: true,
+    origin: corsOrigin,
     optionsSuccessStatus: 200,
     credentials: true,
   })
