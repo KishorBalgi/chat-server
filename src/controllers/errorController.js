@@ -34,8 +34,6 @@ exports.globalErrorHandler = (err, req, res, next) => {
   if (process.env.NODE_ENV === 'development') {
     sendErrDev(err, res);
   } else if (process.env.NODE_ENV === 'production') {
-    console.log(err);
-    console.log(err.message.startsWith('E11000'));
     if (err.message.startsWith('E11000')) err = handleDuplicateKeyErr(err);
     sendErrProd(err, res);
   }

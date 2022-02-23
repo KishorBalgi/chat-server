@@ -9,7 +9,9 @@ const filterObj = (obj, filters) => {
       fltrObj[e] = obj[e];
     }
   });
+  return fltrObj;
 };
+// Delete Me:
 exports.deleteMe = catchAsync(async (req, res, next) => {
   const user = await User.findById(req.user._id)
     .select('+password')
@@ -21,5 +23,22 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
   res.status(204).json({
     status: 'success',
     message: 'User account deleted successfully',
+  });
+});
+// Update Me:
+exports.updateMe = catchAsync(async (req, res, next) => {
+  const data = filterObj(req.body, ['email', 'name']);
+  const user = await User.findByIdAndUpdate(req.user._id, data, {
+    new: true,
+    runValidators: true,
+  });
+
+  res.status(200).json({
+    status: 'success',
+    user: {
+      username: user.name,
+      email: user.email,
+      img: user.img,
+    },
   });
 });
