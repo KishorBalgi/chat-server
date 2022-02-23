@@ -22,22 +22,19 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
-// const cors = require('cors');
+const cookieParser = require('cookie-parser');
+const cors = require('cors');
 const compression = require('compression');
 // Middlewares:
 // CORS:
-// app.use(cors());
-// app.options('*', cors());
-app.use(function (req, res, next) {
-  //Enabling CORS
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET,HEAD,OPTIONS,POST,PUT');
-  res.header(
-    'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept, x-client-key, x-client-token, x-client-secret, Authorization'
-  );
-  next();
-});
+app.use(
+  cors({
+    origin: 'http://localhost:3000',
+    optionsSuccessStatus: 200,
+    credentials: true,
+  })
+);
+app.options('*', cors());
 // Trust proxies:
 app.enable('trust proxy');
 // HTTP Headers:
@@ -59,6 +56,8 @@ app.use('/api', limiter);
 app.use(compression());
 // JSON:
 app.use(express.json());
+// Cookie parser:
+app.use(cookieParser());
 // CSP:
 app.use((req, res, next) => {
   res.setHeader(
@@ -92,4 +91,5 @@ app.all('*', (req, res, next) => {
 });
 
 app.use(errorHandler.globalErrorHandler);
+
 module.exports = app;

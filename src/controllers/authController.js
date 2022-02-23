@@ -41,6 +41,8 @@ exports.protect = catchAsync(async (req, res, next) => {
     req.headers.authorization.startsWith('Bearer')
   ) {
     token = req.headers.authorization.split(' ')[1];
+  } else {
+    token = req.cookies.jwt;
   }
   if (!token) {
     return next(new AppError('You are not logged in. Please login to access.'));
@@ -95,6 +97,15 @@ exports.login = catchAsync(async (req, res, next) => {
   }
   sendToken(user, 200, res);
 });
+
+// Logout:
+exports.logout = (req, res, next) => {
+  res.cookie('jwt', 'userloggedout', {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+  });
+  res.status(200);
+};
 
 // Forgot Password:
 exports.forgotPassword = catchAsync(async (req, res, next) => {
@@ -167,4 +178,32 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   user.password = req.body.newPassword;
   await user.save();
   sendToken(user, 200, res);
+});
+
+// is Logged In:
+exports.isLoggedIn = catchAsync(async (req, res, next) => {
+  if (req.cookies.jwt) {
+    // Validate the token:
+    const decoded = await promisify(jwt.verify)(
+      req.cookies.jwt,
+      process.env.JWT_SK
+    );
+    // Check whether user exists:
+    const user = await User.findById(decoded.id);
+    if (user.checkJWTExpired(decoded.iat)) {
+      return next(
+        new AppError('User password was changed. Login again to access.', 401)
+      );
+    }
+    if (!user) {
+      return next(new AppError('User no longer exists!', 404));
+    }
+    res.status(200).json({
+      status: 'success',
+      user: { username: user.name, email: user.email, img: user.img },
+    });
+  }
+  res.status(200).json({
+    status: 'success',
+  });
 });

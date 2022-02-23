@@ -1,6 +1,6 @@
 // Production error handlers:
 const handleDuplicateKeyErr = (err) => {
-  err.message = 'E-mail already taken.';
+  err.message = `Field already taken: ${err.keyValue.email}`;
   return err;
 };
 // Dev Error:
@@ -34,7 +34,7 @@ exports.globalErrorHandler = (err, req, res, next) => {
   if (process.env.NODE_ENV === 'development') {
     sendErrDev(err, res);
   } else if (process.env.NODE_ENV === 'production') {
-    if (err.message.startsWith('E11000')) err = handleDuplicateKeyErr(err);
+    if (err.code === 11000) err = handleDuplicateKeyErr(err);
     sendErrProd(err, res);
   }
 };

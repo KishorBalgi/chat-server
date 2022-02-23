@@ -28,17 +28,20 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
 // Update Me:
 exports.updateMe = catchAsync(async (req, res, next) => {
   const data = filterObj(req.body, ['email', 'name']);
-  const user = await User.findByIdAndUpdate(req.user._id, data, {
-    new: true,
-    runValidators: true,
-  });
-
-  res.status(200).json({
-    status: 'success',
-    user: {
-      username: user.name,
-      email: user.email,
-      img: user.img,
-    },
-  });
+  try {
+    const user = await User.findByIdAndUpdate(req.user._id, data, {
+      new: true,
+      runValidators: true,
+    });
+    res.status(200).json({
+      status: 'success',
+      user: {
+        username: user.name,
+        email: user.email,
+        img: user.img,
+      },
+    });
+  } catch (err) {
+    next(new AppError('E-mail already taken', 404));
+  }
 });
