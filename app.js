@@ -37,7 +37,11 @@ var allowlist = [
 ];
 var corsOptionsDelegate = function (req, callback) {
   console.log(req.header('Origin'));
-  var corsOptions = { credentials: true };
+  var corsOptions = {
+    credentials: true,
+    methods: 'GET,POST,PATCH,DELETE',
+    allowedHeaders: 'Content-Type,Authorization',
+  };
   if (allowlist.indexOf(req.header('Origin')) !== -1) {
     corsOptions.origin = true; // reflect (enable) the requested origin in the CORS response
   } else {
