@@ -33,9 +33,12 @@ const compression = require('compression');
 // }
 app.use(
   cors({
-    origin: 'https://chat-box-app-client.herokuapp.com',
+    origin: 'https://herokuapp.com',
     optionsSuccessStatus: 200,
+    methods: ['GET', 'POST', 'DELETE', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
+    optionsSuccessStatus: 204,
   })
 );
 app.options('*', cors());
