@@ -16,8 +16,8 @@ const signToken = (id) => {
 const cookieOps = {
   expires: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
   httpOnly: true,
+  secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
 };
-if (process.env.NODE_ENV === 'production') cookieOps.secure = true;
 
 const sendToken = (user, statusCode, res) => {
   user.password = undefined;
