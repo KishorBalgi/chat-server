@@ -29,7 +29,7 @@ const compression = require('compression');
 // CORS:
 app.use(
   cors({
-    origin: 'https://chat-box-app-client.herokuapp.com/',
+    origin: 'https://chat-box-app-client.herokuapp.com',
     credentials: true,
   })
 );
