@@ -70,7 +70,6 @@ exports.signup = catchAsync(async (req, res, next) => {
     email: req.body.email,
     createdAt: Date.now(),
     password: req.body.password,
-    img: 'https://i.ibb.co/d5RgxfH/user-blank.png',
   };
   const newUser = await User.create(data);
   try {
@@ -161,12 +160,6 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
 // Update Password:
 exports.updatePassword = catchAsync(async (req, res, next) => {
-  // Check for same passwords:
-  if (req.body.currPassword === req.body.newPassword) {
-    return next(
-      new AppError('Your new password is same as old password.', 400)
-    );
-  }
   // Verify users old password:
   const user = await User.findById(req.user._id).select('+password');
   if (
@@ -174,6 +167,12 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
     !(await user.checkPassword(req.body.currPassword, user.password))
   ) {
     return next(new AppError('Invalid password.', 401));
+  }
+  // Check for same passwords:
+  if (req.body.currPassword === req.body.newPassword) {
+    return next(
+      new AppError('Your new password is same as old password.', 400)
+    );
   }
   user.password = req.body.newPassword;
   await user.save();
@@ -202,8 +201,9 @@ exports.isLoggedIn = catchAsync(async (req, res, next) => {
       status: 'success',
       user: { username: user.name, email: user.email, img: user.img },
     });
+  } else {
+    res.status(200).json({
+      status: 'success',
+    });
   }
-  res.status(200).json({
-    status: 'success',
-  });
 });

@@ -27,29 +27,12 @@ const cors = require('cors');
 const compression = require('compression');
 // Middlewares:
 // CORS:
-// var corsOrigin = 'http://localhost:3000';
-// if (process.env.NODE_ENV === 'production') {
-//   corsOrigin = 'https://chat-box-app-client.herokuapp.com/';
-// }
-var allowlist = [
-  'http://localhost:3000',
-  'https://chat-box-app-client.herokuapp.com/',
-];
-var corsOptionsDelegate = function (req, callback) {
-  console.log(req.header('Origin'));
-  var corsOptions = {
+app.use(
+  cors({
+    origin: 'https://chat-box-app-server.herokuapp.com',
     credentials: true,
-    methods: 'GET,POST,PATCH,DELETE',
-    allowedHeaders: 'Content-Type,Authorization',
-  };
-  if (allowlist.indexOf(req.header('Origin')) !== -1) {
-    corsOptions.origin = true; // reflect (enable) the requested origin in the CORS response
-  } else {
-    corsOptions.origin = false; // disable CORS for this request
-  }
-  callback(null, corsOptions); // callback expects two parameters: error and options
-};
-app.use(cors(corsOptionsDelegate));
+  })
+);
 app.options('*', cors());
 // Trust proxies:
 app.enable('trust proxy');

@@ -31,7 +31,7 @@ const userSchema = new mongoose.Schema({
   },
   img: {
     type: String,
-    required: [true, 'Profile pic required required'],
+    default: 'https://i.ibb.co/d5RgxfH/user-blank.png',
   },
   passwordChangedAt: Date,
   passwordResetToken: String,
