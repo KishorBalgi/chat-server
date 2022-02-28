@@ -26,11 +26,10 @@ const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const compression = require('compression');
 // Middlewares:
-// https://chat-box-app-server.herokuapp.com/
 // CORS:
 app.use(
   cors({
-    origin: '/example.com$/',
+    origin: 'https://herokuapp.com',
     credentials: true,
   })
 );
