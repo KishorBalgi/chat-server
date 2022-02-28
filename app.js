@@ -43,14 +43,7 @@ app.use(
   })
 );
 app.options('*', cors());
-// Cookie parser:
-app.use(cookieParser());
-// Data sanitization against NoSQL query injection:
-app.use(mongoSanitize());
-// Data sanitization against XSS:
-app.use(xss());
-// Preventing HTTP Parameter Pollution:
-app.use(hpp());
+
 // Rate Limiter:
 const limiter = rateLimit({
   max: 1000,
@@ -60,6 +53,14 @@ const limiter = rateLimit({
 app.use('/api', limiter);
 // JSON:
 app.use(express.json());
+// Cookie parser:
+app.use(cookieParser());
+// Data sanitization against NoSQL query injection:
+app.use(mongoSanitize());
+// Data sanitization against XSS:
+app.use(xss());
+// Preventing HTTP Parameter Pollution:
+app.use(hpp());
 // CSP:
 app.use((req, res, next) => {
   res.setHeader(
