@@ -12,16 +12,16 @@ const signToken = (id) => {
   });
   return token;
 };
-// Cookie Options for JWT:
-const cookieOps = {
-  expires: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
-  httpOnly: true,
-  secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
-};
 
-const sendToken = (user, statusCode, res) => {
+const sendToken = (user, statusCode, req, res) => {
   user.password = undefined;
   const token = signToken(user._id);
+  // Cookie Options for JWT:
+  const cookieOps = {
+    expires: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
+    httpOnly: true,
+    secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
+  };
   res.cookie('jwt', token, cookieOps);
   res.status(statusCode).json({
     status: 'success',
@@ -81,7 +81,7 @@ exports.signup = catchAsync(async (req, res, next) => {
   } catch (err) {
     return next(new AppError(`Could not send email.`), 500);
   }
-  sendToken(newUser, 201, res);
+  sendToken(newUser, 201, req, res);
 });
 
 // Login:
@@ -94,7 +94,7 @@ exports.login = catchAsync(async (req, res, next) => {
   if (!user || !(await user.checkPassword(password, user.password))) {
     return next(new AppError('Invalid E-mail or Password', 401));
   }
-  sendToken(user, 200, res);
+  sendToken(user, 200, req, res);
 });
 
 // Logout:
@@ -155,7 +155,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   user.passwordResetExpires = undefined;
   await user.save();
 
-  sendToken(user, 200, res);
+  sendToken(user, 200, req, res);
 });
 
 // Update Password:
@@ -176,7 +176,7 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   }
   user.password = req.body.newPassword;
   await user.save();
-  sendToken(user, 200, res);
+  sendToken(user, 200, req, res);
 });
 
 // is Logged In:
