@@ -26,6 +26,8 @@ const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const compression = require('compression');
 // Middlewares:
+// Cookie parser:
+app.use(cookieParser());
 // CORS:
 app.use(
   cors({
@@ -58,8 +60,6 @@ app.use('/api', limiter);
 app.use(compression());
 // JSON:
 app.use(express.json());
-// Cookie parser:
-app.use(cookieParser());
 // CSP:
 app.use((req, res, next) => {
   res.setHeader(
