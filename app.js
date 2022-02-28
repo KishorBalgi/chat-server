@@ -26,8 +26,12 @@ const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const compression = require('compression');
 // Middlewares:
-// Cookie parser:
-app.use(cookieParser());
+// Trust proxies:
+app.enable('trust proxy');
+// Compress responses:
+app.use(compression());
+// HTTP Headers:
+app.use(helmet());
 // CORS:
 app.use(
   cors({
@@ -39,10 +43,8 @@ app.use(
   })
 );
 app.options('*', cors());
-// Trust proxies:
-app.enable('trust proxy');
-// HTTP Headers:
-app.use(helmet());
+// Cookie parser:
+app.use(cookieParser());
 // Data sanitization against NoSQL query injection:
 app.use(mongoSanitize());
 // Data sanitization against XSS:
@@ -56,8 +58,6 @@ const limiter = rateLimit({
   message: 'Too many requests, try again after an hour',
 });
 app.use('/api', limiter);
-// Compress responses:
-app.use(compression());
 // JSON:
 app.use(express.json());
 // CSP:
