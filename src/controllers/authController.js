@@ -1,4 +1,5 @@
 const User = require('../models/user');
+const ChatList = require('../models/chat-list');
 const AppError = require('../utils/appErrors');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
@@ -12,7 +13,12 @@ const signToken = (id) => {
   });
   return token;
 };
-
+exports.verifyToken = async (token) => {
+  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SK);
+  // Check whether user exists:
+  const user = await User.findById(decoded.id);
+  return user;
+};
 const sendToken = (user, statusCode, req, res) => {
   user.password = undefined;
   const token = signToken(user._id);
@@ -21,7 +27,7 @@ const sendToken = (user, statusCode, req, res) => {
     expires: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
     httpOnly: true,
     secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
-    sameSite: 'none',
+    // sameSite: 'none',
   };
   res.cookie('jwt', token, cookieOps);
   res.status(statusCode).json({
@@ -31,6 +37,7 @@ const sendToken = (user, statusCode, req, res) => {
       username: user.name,
       img: user.img,
     },
+    token,
   });
 };
 
@@ -49,16 +56,14 @@ exports.protect = catchAsync(async (req, res, next) => {
     return next(new AppError('You are not logged in. Please login to access.'));
   }
   // Validate the token:
-  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SK);
-  // Check whether user exists:
-  const user = await User.findById(decoded.id);
-  if (user.checkJWTExpired(decoded.iat)) {
+  const user = await this.verifyToken(token);
+  if (!user) {
+    return next(new AppError('User no longer exists!', 404));
+  }
+  if (user.checkJWTExpired(user.iat)) {
     return next(
       new AppError('User password was changed. Login again to access.', 401)
     );
-  }
-  if (!user) {
-    return next(new AppError('User no longer exists!', 404));
   }
   req.user = user;
   next();
@@ -73,6 +78,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     password: req.body.password,
   };
   const newUser = await User.create(data);
+  await ChatList.create({ user: newUser._id });
   try {
     await sendEmail({
       email: data.email,
@@ -184,19 +190,14 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
 exports.isLoggedIn = catchAsync(async (req, res, next) => {
   if (req.cookies.jwt) {
     // Validate the token:
-    const decoded = await promisify(jwt.verify)(
-      req.cookies.jwt,
-      process.env.JWT_SK
-    );
-    // Check whether user exists:
-    const user = await User.findById(decoded.id);
-    if (user.checkJWTExpired(decoded.iat)) {
+    const user = await this.verifyToken(req.cookies.jwt);
+    if (!user) {
+      return next(new AppError('User no longer exists!', 404));
+    }
+    if (user.checkJWTExpired(user.iat)) {
       return next(
         new AppError('User password was changed. Login again to access.', 401)
       );
-    }
-    if (!user) {
-      return next(new AppError('User no longer exists!', 404));
     }
     res.status(200).json({
       status: 'success',

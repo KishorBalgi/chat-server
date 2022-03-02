@@ -5,11 +5,12 @@ const fs = require('fs');
 const chatlist = fs.readFileSync('./src/test-data/chat-list.json', 'utf-8');
 const chatlistObj = JSON.parse(chatlist);
 // Chats:
-const chats = fs.readFileSync('./src/test-data/chats.json', 'utf-8');
-const chatsObj = JSON.parse(chats);
+const chatsF = fs.readFileSync('./src/test-data/chats.json', 'utf-8');
+const chatsObj = JSON.parse(chatsF);
 // Routers:
 const auth = require('./src/routes/authRoute');
 const user = require('./src/routes/userRoute');
+const chats = require('./src/routes/chatsRoute');
 
 // const chats = require('./src/routes/chats');
 
@@ -84,7 +85,7 @@ app.use('/api/v1/user/auth', auth);
 app.use('/api/v1/user', user);
 
 // Chats:
-// app.use('/api/v1/user/chats', chats);
+app.use('/api/v1/chats', chats);
 
 // Unhandled Routes:
 app.all('*', (req, res, next) => {

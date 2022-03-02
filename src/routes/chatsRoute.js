@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
+const authController = require('../controllers/authController');
+const chatsController = require('../controllers/chatsController');
 
-// SignUp:
-router.route('/get').post(authController.signup);
+router.route('/getChats').get(authController.protect, chatsController.getChats);
 
 module.exports = router;
