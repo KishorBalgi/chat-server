@@ -81,6 +81,7 @@ app.get('/api/v1/chats', (req, res) => {
 
 // User Auth:
 app.use('/api/v1/user/auth', auth);
+
 // User:
 app.use('/api/v1/user', user);
 

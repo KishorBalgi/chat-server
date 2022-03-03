@@ -11,6 +11,16 @@ const filterObj = (obj, filters) => {
   });
   return fltrObj;
 };
+// Search users:
+exports.searchUsers = catchAsync(async (req, res, next) => {
+  const users = await User.find({
+    name: { $regex: req.body.search, $options: 'i' },
+  });
+  res.status(200).json({
+    status: 'success',
+    users,
+  });
+});
 // Delete Me:
 exports.deleteMe = catchAsync(async (req, res, next) => {
   const user = await User.findById(req.user._id)
