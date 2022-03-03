@@ -1,16 +1,20 @@
 const mongoose = require('mongoose');
 
 const chatsSchema = new mongoose.Schema({
-  recipient_name: {
+  room: {
     type: String,
-    required: [true, 'Recipirnt Username required'],
+    required: [true, 'A chat must have a room'],
+    unique: [true, 'A chat room must be unique'],
   },
-  recipient_uid: { type: String, required: [true, 'Recipient UID required'] },
-  receiver_uid: { type: String, required: [true, 'Receiver UID required'] },
-  chatStart: { type: Date, required: [true, 'Chat Start Date required'] },
-  msgNewest: { type: String },
-  chats: { type: Array },
+  users: [{ type: mongoose.Schema.ObjectId, ref: 'Users' }],
+  chats: [{ type: mongoose.Schema.ObjectId, ref: 'UserChat' }],
 });
 
-const Chats = mongoose.model('chats', chatsSchema);
+chatsSchema.pre(/^find/, function () {
+  this.populate({
+    path: 'chats',
+  });
+});
+const Chats = mongoose.model('Chats', chatsSchema);
+
 module.exports = Chats;

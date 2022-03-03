@@ -27,12 +27,13 @@ const sendToken = (user, statusCode, req, res) => {
     expires: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
     httpOnly: true,
     secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
-    sameSite: 'none',
+    // sameSite: 'none',
   };
   res.cookie('jwt', token, cookieOps);
   res.status(statusCode).json({
     status: 'success',
     user: {
+      id: user._id,
       email: user.email,
       username: user.name,
       img: user.img,
@@ -201,7 +202,12 @@ exports.isLoggedIn = catchAsync(async (req, res, next) => {
     }
     res.status(200).json({
       status: 'success',
-      user: { username: user.name, email: user.email, img: user.img },
+      user: {
+        id: user._id,
+        username: user.name,
+        email: user.email,
+        img: user.img,
+      },
     });
   } else {
     res.status(200).json({

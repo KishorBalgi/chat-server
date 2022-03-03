@@ -5,13 +5,17 @@ const { Server } = require('socket.io');
 // 'http://localhost:3000'
 const io = new Server(server, {
   cors: {
-    origin: 'https://chat-box-app-client.herokuapp.com',
+    origin: [
+      'https://chat-box-app-client.herokuapp.com',
+      'http://localhost:3000',
+    ],
     methods: ['GET', 'POST'],
   },
 });
 const dotenv = require('dotenv');
 const mogoose = require('mongoose');
 const authController = require('./src/controllers/authController');
+const socketController = require('./src/controllers/socketController');
 
 process.on('uncaughtException', (err) => {
   console.log(err.name + ': ' + err.message);
@@ -39,26 +43,29 @@ const ser = server.listen(process.env.PORT || PORT, () => {
 
 // Socket:
 io.use(async (socket, next) => {
-  if (socket.handshake.auth.token) {
-    user = await authController.verifyToken(socket.handshake.auth.token, next);
-    if (!user) {
-      return next(new Error('User no longer exists!', 404));
-    }
-    if (user.checkJWTExpired(user.iat)) {
-      return next(
-        new Error('User password was changed. Login again to access.', 401)
-      );
-    }
-    socket.uid = user._id;
-    next();
-  } else {
-    next(new Error('Please Login'));
+  if (!socket.handshake.auth.token) return next(new Error('Please Login'));
+  const user = await authController.verifyToken(socket.handshake.auth.token);
+  if (!user) {
+    return next(new Error('User no longer exists!', 404));
   }
+  if (user.checkJWTExpired(user.iat)) {
+    return next(
+      new Error('User password was changed. Login again to access.', 401)
+    );
+  }
+  socket.uid = user._id;
+  next();
 });
 io.on('connection', (socket) => {
   console.log(`${socket.id} connected`);
-  socket.on('msg', (msg) => {
-    console.log('Message: ', msg);
+  socket.on('join-room', async (id, cb) => {
+    const room = await socketController.joinRoom(socket.uid, id);
+    socket.join(room);
+    cb(room);
+  });
+  socket.on('send-message', async (msg, room) => {
+    socketController.storeChat(msg, room, socket.uid);
+    socket.to(room).emit('receive-message', msg, socket.uid);
   });
 });
 
