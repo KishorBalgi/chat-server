@@ -19,24 +19,3 @@ exports.storeChat = catchAsync(async (msg, room, id) => {
   const chat = await UserChat.create({ user: id, message: msg });
   await Chats.findOneAndUpdate({ room }, { $push: { chats: chat._id } });
 });
-
-// Update DB on disconnect:
-exports.updateDBOnDisconnect = catchAsync(async (id) => {
-  const chats = await Chats.find({
-    users: { $all: [id] },
-    lastUpdated: { $exists: true },
-  })
-    .sort({ lastUpdated: -1 })
-    .select('-_id -chats -lastUpdated -room -__v');
-  const idArr = chats.map((u) => {
-    const uarr = u.users;
-    const i = uarr.find((a) => a.toString() != id.toString());
-    return i;
-  });
-  // console.log(usersArr);
-
-  const chatlist = await ChatList.findOneAndUpdate(
-    { user: id },
-    { chats: idArr }
-  );
-});

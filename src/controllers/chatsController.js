@@ -4,11 +4,27 @@ const AppError = require('../utils/appErrors');
 const catchAsync = require('../utils/catchAsync');
 
 exports.getChats = catchAsync(async (req, res, next) => {
-  const chats = await Chatlist.findOne({ user: req.user._id });
+  const id = req.user._id;
+  let chats = await Chats.find({
+    users: { $all: [id] },
+    lastUpdated: { $exists: true },
+  })
+    .sort({ lastUpdated: -1 })
+    .select('-_id -chats -lastUpdated -room -__v');
+  const idArr = chats.map((u) => {
+    const uarr = u.users;
+    const i = uarr.find((a) => a.toString() != id.toString());
+    return i;
+  });
+  const chatlist = await Chatlist.findOneAndUpdate(
+    { user: id },
+    { chats: idArr },
+    { new: true }
+  );
   res.status(200).json({
     status: 'success',
-    chatlist: chats.chats,
-    chatsID: chats._id,
+    chatlist: chatlist.chats,
+    chatsID: chatlist._id,
   });
 });
 

@@ -69,7 +69,6 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', () => {
-    socketController.updateDBOnDisconnect(socket.uid);
     console.log(`🔴 ${socket.id} disconnected`);
   });
 });
