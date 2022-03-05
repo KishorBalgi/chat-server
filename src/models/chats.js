@@ -8,13 +8,25 @@ const chatsSchema = new mongoose.Schema({
   },
   users: [{ type: mongoose.Schema.ObjectId, ref: 'Users' }],
   chats: [{ type: mongoose.Schema.ObjectId, ref: 'UserChat' }],
+  lastUpdated: {
+    type: Date,
+  },
 });
 
-chatsSchema.pre(/^find/, function () {
+chatsSchema.pre('findOneAndUpdate', function (next) {
+  this.set({ lastUpdated: new Date() });
+  next();
+});
+
+chatsSchema.pre(/^findOne/, function (next) {
   this.populate({
     path: 'chats',
+  }).populate({
+    path: 'users',
   });
+  next();
 });
+
 const Chats = mongoose.model('Chats', chatsSchema);
 
 module.exports = Chats;

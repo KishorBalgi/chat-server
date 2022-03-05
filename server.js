@@ -2,7 +2,6 @@ const app = require('./app');
 const http = require('http');
 const server = http.createServer(app);
 const { Server } = require('socket.io');
-// 'http://localhost:3000'
 const io = new Server(server, {
   cors: {
     origin: [
@@ -57,15 +56,21 @@ io.use(async (socket, next) => {
   next();
 });
 io.on('connection', (socket) => {
-  console.log(`${socket.id} connected`);
+  console.log(`🟢 ${socket.id} connected`);
   socket.on('join-room', async (id, cb) => {
     const room = await socketController.joinRoom(socket.uid, id);
     socket.join(room);
     cb(room);
   });
   socket.on('send-message', async (msg, room) => {
+    if (msg === '') return;
     socketController.storeChat(msg, room, socket.uid);
     socket.to(room).emit('receive-message', msg, socket.uid);
+  });
+
+  socket.on('disconnect', () => {
+    socketController.updateDBOnDisconnect(socket.uid);
+    console.log(`🔴 ${socket.id} disconnected`);
   });
 });
 

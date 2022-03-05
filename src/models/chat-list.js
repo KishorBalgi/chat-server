@@ -6,14 +6,12 @@ const chatListSchema = new mongoose.Schema({
     ref: 'Users',
     required: [true, 'Chat list must have a user id'],
   },
-  chats: {
-    type: [
-      {
-        type: mongoose.Schema.ObjectId,
-        ref: 'Users',
-      },
-    ],
-  },
+  chats: [
+    {
+      type: mongoose.Schema.ObjectId,
+      ref: 'Users',
+    },
+  ],
 });
 
 chatListSchema.pre(/^find/, function (next) {
