@@ -11,6 +11,14 @@ const filterObj = (obj, filters) => {
   });
   return fltrObj;
 };
+// Search user by ID:
+exports.searchUserById = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.body.id).select('name img');
+  res.status(200).json({
+    status: 'success',
+    user,
+  });
+});
 // Search users:
 exports.searchUsers = catchAsync(async (req, res, next) => {
   const users = await User.find({

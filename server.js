@@ -41,6 +41,7 @@ const ser = server.listen(process.env.PORT || PORT, () => {
 });
 
 // Socket:
+// Auth:
 io.use(async (socket, next) => {
   if (!socket.handshake.auth.token) return next(new Error('Please Login'));
   const user = await authController.verifyToken(socket.handshake.auth.token);
@@ -55,19 +56,22 @@ io.use(async (socket, next) => {
   socket.uid = user._id;
   next();
 });
+// On Connection:
 io.on('connection', (socket) => {
   console.log(`🟢 ${socket.id} connected`);
+  socket.join(socket.uid.toString());
   socket.on('join-room', async (id, cb) => {
     const room = await socketController.joinRoom(socket.uid, id);
     socket.join(room);
+    // socket.to(room).emit('online', true);
     cb(room);
   });
-  socket.on('send-message', async (msg, room) => {
+  socket.on('send-message', async (msg, room, toId) => {
     if (msg === '') return;
     socketController.storeChat(msg, room, socket.uid);
     socket.to(room).emit('receive-message', msg, socket.uid);
+    socket.to(toId).emit('new-message-from', socket.uid);
   });
-
   socket.on('disconnect', () => {
     console.log(`🔴 ${socket.id} disconnected`);
   });

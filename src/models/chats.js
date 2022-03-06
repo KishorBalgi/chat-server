@@ -23,6 +23,7 @@ chatsSchema.pre(/^findOne/, function (next) {
     path: 'chats',
   }).populate({
     path: 'users',
+    select: 'name img',
   });
   next();
 });
