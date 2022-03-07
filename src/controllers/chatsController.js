@@ -40,10 +40,11 @@ exports.getChatHistory = catchAsync(async (req, res, next) => {
       status: 'success',
       chats: null,
     });
+  } else {
+    res.status(200).json({
+      status: 'success',
+      users: history.users,
+      chats: history.chats,
+    });
   }
-  res.status(200).json({
-    status: 'success',
-    users: history.users,
-    chats: history.chats,
-  });
 });

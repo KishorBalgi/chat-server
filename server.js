@@ -60,9 +60,11 @@ io.use(async (socket, next) => {
 io.on('connection', (socket) => {
   console.log(`🟢 ${socket.id} connected`);
   socket.join(socket.uid.toString());
-  socket.on('join-room', async (id, cb) => {
-    const room = await socketController.joinRoom(socket.uid, id);
+  socket.on('join-room', async (props, cb) => {
+    if (props.currRoom) socket.leave(props.currRoom);
+    const room = await socketController.joinRoom(socket.uid, props.id);
     socket.join(room);
+    console.log(socket.rooms);
     // socket.to(room).emit('online', true);
     cb(room);
   });
