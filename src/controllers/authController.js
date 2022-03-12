@@ -23,13 +23,13 @@ const sendToken = (user, statusCode, req, res) => {
   user.password = undefined;
   const token = signToken(user._id);
   // Cookie Options for JWT:
-  // const cookieOps = {
-  //   expires: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
-  //   httpOnly: true,
-  //   secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
-  // };
-  // if (process.env.NODE_ENV === 'production') cookieOps.sameSite = 'none';
-  // res.cookie('jwt', token, cookieOps);
+  const cookieOps = {
+    expires: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
+    httpOnly: true,
+    secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
+  };
+  if (process.env.NODE_ENV === 'production') cookieOps.sameSite = 'none';
+  res.cookie('jwt', token, cookieOps);
   res.status(statusCode).json({
     status: 'success',
     user: {

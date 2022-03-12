@@ -1,8 +1,10 @@
 const Chatlist = require('../models/chat-list');
 const Chats = require('../models/chats');
+const UserChats = require('../models/userChat');
 const AppError = require('../utils/appErrors');
 const catchAsync = require('../utils/catchAsync');
 
+// Get Chats of a user:
 exports.getChats = catchAsync(async (req, res, next) => {
   const id = req.user._id;
   let chats = await Chats.find({
@@ -28,6 +30,7 @@ exports.getChats = catchAsync(async (req, res, next) => {
   });
 });
 
+// Get Chat from a specific room:
 exports.getChatHistory = catchAsync(async (req, res, next) => {
   if (!req.body.id) {
     return next(new AppError('Please define a user id', 400));
@@ -48,3 +51,32 @@ exports.getChatHistory = catchAsync(async (req, res, next) => {
     });
   }
 });
+
+exports.deleteMessage = catchAsync(async (req, res, next) => {
+  if (!req.params.recId && !req.params.msgId) {
+    return next(new AppError('Chat id required', 400));
+  }
+  await UserChats.findByIdAndDelete(req.params.msgId);
+  await Chats.findOneAndUpdate(
+    {
+      users: { $all: [req.user._id, req.params.recId] },
+    },
+    { $pull: { chats: req.params.msgId } }
+  );
+  res.status(200).json({ status: 'success' });
+});
+
+// exports.deleteChatFormChatList = catchAsync(async (req, res, next) => {
+//   if (!req.body.id) {
+//     return next(
+//       new AppError('Please define the id of the chat u want to delete', 400)
+//     );
+//   }
+//   await Chatlist.findOneAndUpdate(
+//     { user: req.user._id },
+//     { $pull: { chats: req.body.id } }
+//   );
+//   res.status(200).json({
+//     status: 'success',
+//   });
+// });

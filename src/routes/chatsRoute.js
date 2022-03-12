@@ -9,4 +9,11 @@ router
   .route('/getChatHistory')
   .post(authController.protect, chatsController.getChatHistory);
 
+router
+  .route('/deleteMessage/:recId/:msgId')
+  .delete(authController.protect, chatsController.deleteMessage);
+
+// router
+//   .route('/deleteChat')
+//   .delete(authController.protect, chatsController.deleteChatFormChatList);
 module.exports = router;

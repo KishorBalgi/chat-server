@@ -64,7 +64,6 @@ io.on('connection', (socket) => {
     if (props.currRoom) socket.leave(props.currRoom);
     const room = await socketController.joinRoom(socket.uid, props.id);
     socket.join(room);
-    console.log(socket.rooms);
     // socket.to(room).emit('online', true);
     cb(room);
   });
