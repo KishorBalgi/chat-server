@@ -67,7 +67,7 @@ io.on('connection', (socket) => {
     cb(room);
   });
   socket.on('isOnline', (user, cb) => {
-    const rooms = io.sockets.adapter.rooms['cluster'];
+    const rooms = io.sockets.adapter.rooms;
     console.log(rooms);
     cb(true);
   });
