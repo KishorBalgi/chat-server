@@ -37,7 +37,7 @@ app.use(helmet());
 app.use(
   cors({
     origin: [
-      'https://chatter-app-client.herokuapp.com/',
+      'https://chatter-app-client.herokuapp.com',
       'http://localhost:3000',
     ],
     credentials: true,
