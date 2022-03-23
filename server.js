@@ -67,9 +67,7 @@ io.on('connection', (socket) => {
   });
   socket.on('isOnline', (user, cb) => {
     const rooms = io.sockets.adapter.rooms;
-    console.log(rooms);
-    const i = rooms.findIndex((r) => r === user.toString());
-    cb(i != -1 ? true : false);
+    cb(true);
   });
   socket.on('send-message', async (msg, room, toId) => {
     if (msg === '') return;
