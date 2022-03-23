@@ -1,19 +1,10 @@
 const express = require('express');
 const app = express();
 const fs = require('fs');
-// Chatlist:
-const chatlist = fs.readFileSync('./src/test-data/chat-list.json', 'utf-8');
-const chatlistObj = JSON.parse(chatlist);
-// Chats:
-const chatsF = fs.readFileSync('./src/test-data/chats.json', 'utf-8');
-const chatsObj = JSON.parse(chatsF);
 // Routers:
 const auth = require('./src/routes/authRoute');
 const user = require('./src/routes/userRoute');
 const chats = require('./src/routes/chatsRoute');
-
-// const chats = require('./src/routes/chats');
-
 // Error Handlers:
 const AppError = require('./src/utils/appErrors');
 const errorHandler = require('./src/controllers/errorController');
@@ -70,15 +61,11 @@ app.use((req, res, next) => {
   );
   next();
 });
-
-app.get('/api/v1/chatlist', (req, res) => {
-  res.json(chatlistObj);
+app.get('/', (req, res) => {
+  res.render(
+    `<h1>This is a server for Chatter - messaging application</h1><a href="https://chatter-app-client.herokuapp.com"></a>`
+  );
 });
-
-app.get('/api/v1/chats', (req, res) => {
-  res.json(chatsObj);
-});
-
 // User Auth:
 app.use('/api/v1/user/auth', auth);
 
