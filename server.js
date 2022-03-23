@@ -58,6 +58,7 @@ io.use(async (socket, next) => {
 // On Connection:
 io.on('connection', (socket) => {
   console.log(`${socket.id} user connected`);
+  socket.join('cluster');
   socket.join(socket.uid.toString());
   socket.on('join-room', async (props, cb) => {
     if (props.currRoom) socket.leave(props.currRoom);
@@ -66,7 +67,8 @@ io.on('connection', (socket) => {
     cb(room);
   });
   socket.on('isOnline', (user, cb) => {
-    const rooms = io.sockets.adapter.rooms;
+    const rooms = io.sockets.adapter.rooms['cluster'];
+    console.log(rooms);
     cb(true);
   });
   socket.on('send-message', async (msg, room, toId) => {
@@ -85,6 +87,7 @@ const PORT = process.env.PORT;
 const ser = server.listen(process.env.PORT || PORT, () => {
   console.log(`Listening to requests on port ${PORT}`);
 });
+
 process.on('unhandledRejection', (err) => {
   console.log(err.name + ': ' + err.message);
   console.log('Error 💥: Shutting down app...');
