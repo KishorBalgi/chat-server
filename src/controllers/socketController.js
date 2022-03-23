@@ -1,4 +1,3 @@
-const ChatList = require('../models/chat-list');
 const Chats = require('../models/chats');
 const UserChat = require('../models/userChat');
 const crypto = require('crypto');

@@ -11,19 +11,21 @@ const io = new Server(server, {
     methods: ['GET', 'POST'],
   },
 });
+
 const dotenv = require('dotenv');
 const mogoose = require('mongoose');
 const authController = require('./src/controllers/authController');
 const socketController = require('./src/controllers/socketController');
+
+// Config.env:
+dotenv.config({ path: './config.env' });
 
 process.on('uncaughtException', (err) => {
   console.log(err.name + ': ' + err.message);
   console.log('Error💥: Shutting down app...');
   process.exit(1);
 });
-// Config.env:
-dotenv.config({ path: './config.env' });
-const PORT = process.env.PORT;
+
 // DB:
 const DB = process.env.DATABASE.replace(
   '<PASSWORD>',
@@ -35,13 +37,10 @@ mogoose
   })
   .then(() => console.log('Database connection successful!'))
   .catch((err) => console.log(err));
-// Server:
-const ser = server.listen(process.env.PORT || PORT, () => {
-  console.log(`Listening to requests on port ${PORT}`);
-});
 
 // Socket:
 // Auth:
+
 io.use(async (socket, next) => {
   if (!socket.handshake.auth.token) return next(new Error('Please Login'));
   const user = await authController.verifyToken(socket.handshake.auth.token);
@@ -58,14 +57,19 @@ io.use(async (socket, next) => {
 });
 // On Connection:
 io.on('connection', (socket) => {
-  console.log(`🟢 ${socket.id} connected`);
+  console.log(`${socket.id} user connected`);
   socket.join(socket.uid.toString());
   socket.on('join-room', async (props, cb) => {
     if (props.currRoom) socket.leave(props.currRoom);
     const room = await socketController.joinRoom(socket.uid, props.id);
     socket.join(room);
-    // socket.to(room).emit('online', true);
     cb(room);
+  });
+  socket.on('isOnline', (user, cb) => {
+    const rooms = io.sockets.adapter.rooms;
+    console.log(rooms);
+    const i = rooms.findIndex((r) => r === user.toString());
+    cb(i != -1 ? true : false);
   });
   socket.on('send-message', async (msg, room, toId) => {
     if (msg === '') return;
@@ -74,10 +78,15 @@ io.on('connection', (socket) => {
     socket.to(toId).emit('new-message-from', socket.uid);
   });
   socket.on('disconnect', () => {
-    console.log(`🔴 ${socket.id} disconnected`);
+    socket.leave(socket.uid.toString());
+    console.log(`${socket.id} disconnected`);
   });
 });
-
+// Server:
+const PORT = process.env.PORT;
+const ser = server.listen(process.env.PORT || PORT, () => {
+  console.log(`Listening to requests on port ${PORT}`);
+});
 process.on('unhandledRejection', (err) => {
   console.log(err.name + ': ' + err.message);
   console.log('Error 💥: Shutting down app...');

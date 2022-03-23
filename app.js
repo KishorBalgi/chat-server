@@ -1,6 +1,5 @@
 const express = require('express');
 const app = express();
-const fs = require('fs');
 // Routers:
 const auth = require('./src/routes/authRoute');
 const user = require('./src/routes/userRoute');
@@ -62,8 +61,9 @@ app.use((req, res, next) => {
   next();
 });
 app.get('/', (req, res) => {
-  res.render(
-    `<h1>This is a server for Chatter - messaging application</h1><a href="https://chatter-app-client.herokuapp.com"></a>`
+  res.setHeader('Content-Type', 'text/html');
+  res.end(
+    `<h1>This is a server for Chatter - messaging application</h1><a href="https://chatter-app-client.herokuapp.com">Chatter Application</a>`
   );
 });
 // User Auth:
