@@ -5,7 +5,7 @@ const { Server } = require('socket.io');
 const io = new Server(server, {
   cors: {
     origin: [
-      'https://chat-box-app-client.herokuapp.com',
+      'https://chatter-app-client.herokuapp.com',
       'http://localhost:3000',
     ],
     methods: ['GET', 'POST'],
