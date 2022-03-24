@@ -4,10 +4,7 @@ const server = http.createServer(app);
 const { Server } = require('socket.io');
 const io = new Server(server, {
   cors: {
-    origin: [
-      'https://chatter-app-client.herokuapp.com',
-      'http://localhost:3000',
-    ],
+    origin: ['https://chit-chat-client.herokuapp.com', 'http://localhost:3000'],
     methods: ['GET', 'POST'],
   },
 });
@@ -56,29 +53,39 @@ io.use(async (socket, next) => {
   next();
 });
 // On Connection:
+const users = [];
 io.on('connection', (socket) => {
   console.log(`${socket.id} user connected`);
   socket.join('cluster');
   socket.join(socket.uid.toString());
+  users.push(socket.uid.toString());
+  // Send user online to cluster:
+  socket.to('cluster').emit('online', socket.uid);
+  // Check whether user is online:
+  socket.on('isOnline', (id, cb) => {
+    const i = users.indexOf(id);
+    cb(i !== -1 ? true : false);
+  });
+  // Join a room:
   socket.on('join-room', async (props, cb) => {
     if (props.currRoom) socket.leave(props.currRoom);
     const room = await socketController.joinRoom(socket.uid, props.id);
     socket.join(room);
     cb(room);
   });
-  socket.on('isOnline', (user, cb) => {
-    const rooms = io.sockets.adapter.rooms;
-    console.log(rooms.get('cluster'));
-    cb(true);
-  });
+  // Send message:
   socket.on('send-message', async (msg, room, toId) => {
     if (msg === '') return;
     socketController.storeChat(msg, room, socket.uid);
     socket.to(room).emit('receive-message', msg, socket.uid);
     socket.to(toId).emit('new-message-from', socket.uid);
   });
+  // User Disconnect:
   socket.on('disconnect', () => {
-    socket.leave(socket.uid.toString());
+    // Send user offline to cluster:
+    socket.to('cluster').emit('offline', socket.uid);
+    const i = users.indexOf(socket.uid.toString());
+    if (i !== -1) users.splice(i, 1);
     console.log(`${socket.id} disconnected`);
   });
 });

@@ -26,10 +26,7 @@ app.use(helmet());
 // CORS:
 app.use(
   cors({
-    origin: [
-      'https://chatter-app-client.herokuapp.com',
-      'http://localhost:3000',
-    ],
+    origin: ['https://chit-chat-client.herokuapp.com', 'http://localhost:3000'],
     credentials: true,
   })
 );
