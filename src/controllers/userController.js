@@ -36,7 +36,7 @@ const filterObj = (obj, filters) => {
 };
 // Search user by ID:
 exports.searchUserById = catchAsync(async (req, res, next) => {
-  const user = await User.findById(req.body.id).select('name img');
+  const user = await User.findById(req.body.id).select('name photo');
   res.status(200).json({
     status: 'success',
     user,
