@@ -17,7 +17,7 @@ const chatListSchema = new mongoose.Schema({
 chatListSchema.pre(/^find/, function (next) {
   this.populate({
     path: 'chats',
-    select: 'name img',
+    select: 'name photo',
   });
   next();
 });

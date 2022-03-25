@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const app = express();
 // Routers:
@@ -57,6 +58,8 @@ app.use((req, res, next) => {
   );
   next();
 });
+// Static:
+app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', (req, res) => {
   res.setHeader('Content-Type', 'text/html');
   res.end(

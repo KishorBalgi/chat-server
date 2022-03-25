@@ -1,7 +1,30 @@
+const fs = require('fs');
 const User = require('../models/user');
 const AppError = require('../utils/appErrors');
 const catchAsync = require('../utils/catchAsync');
-// Data filerer:
+const multer = require('multer');
+const sharp = require('sharp');
+// Multer:
+const multerStorage = multer.memoryStorage();
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image')) cb(null, true);
+  else cb(new AppError('Please upload a image', 400), false);
+};
+const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
+exports.uploadImage = upload.single('photo');
+// Resize Images:
+exports.resizeProfilePic = catchAsync(async (req, res, next) => {
+  if (!req.file) return next();
+
+  req.file.filename = 'tempProfilePic.jpeg';
+  await sharp(req.file.buffer)
+    .resize(500, 500)
+    .toFormat('jpeg')
+    .jpeg({ quality: 100 })
+    .toFile(`public/img/users/${req.file.filename}`);
+  next();
+});
+// Data fileter:
 const filterObj = (obj, filters) => {
   const fltrObj = {};
   Object.keys(obj).forEach((e) => {
@@ -62,4 +85,15 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   } catch (err) {
     next(new AppError('E-mail already taken', 404));
   }
+});
+// Upload Profile Pic:
+exports.uploadProfilePic = catchAsync(async (req, res, next) => {
+  const profilePicBuffer = fs.readFileSync(
+    'public/img/users/tempProfilePic.jpeg'
+  );
+  if (!req.file) return new AppError('Please upload an image', 400);
+  await User.findByIdAndUpdate(req.user._id, { photo: profilePicBuffer });
+  res.status(200).json({
+    status: 'success',
+  });
 });

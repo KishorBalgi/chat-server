@@ -36,7 +36,7 @@ const sendToken = (user, statusCode, req, res) => {
       id: user._id,
       email: user.email,
       username: user.name,
-      img: user.img,
+      photo: user.photo,
     },
     token,
   });
@@ -206,7 +206,7 @@ exports.isLoggedIn = catchAsync(async (req, res, next) => {
         id: user._id,
         username: user.name,
         email: user.email,
-        img: user.img,
+        photo: user.photo,
       },
     });
   } else {

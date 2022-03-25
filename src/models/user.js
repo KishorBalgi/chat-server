@@ -30,16 +30,15 @@ const userSchema = new mongoose.Schema({
     enum: ['user', 'admin'],
     default: 'user',
   },
-  img: {
-    type: String,
-    default: 'https://i.ibb.co/d5RgxfH/user-blank.png',
-  },
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetExpires: Date,
   active: {
     type: Boolean,
     default: true,
+  },
+  photo: {
+    type: Buffer,
   },
 });
 // Indexes:
