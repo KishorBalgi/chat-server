@@ -8,7 +8,7 @@ const sharp = require('sharp');
 const multerStorage = multer.memoryStorage();
 const multerFilter = (req, file, cb) => {
   if (file.mimetype.startsWith('image')) cb(null, true);
-  else cb(new AppError('Please upload a image', 400), false);
+  else cb(new AppError('Please upload an image', 400), false);
 };
 const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
 exports.uploadImage = upload.single('photo');
@@ -88,12 +88,26 @@ exports.updateMe = catchAsync(async (req, res, next) => {
 });
 // Upload Profile Pic:
 exports.uploadProfilePic = catchAsync(async (req, res, next) => {
-  const profilePicBuffer = fs.readFileSync(
-    'public/img/users/tempProfilePic.jpeg'
-  );
-  if (!req.file) return new AppError('Please upload an image', 400);
-  await User.findByIdAndUpdate(req.user._id, { photo: profilePicBuffer });
+  let user;
+  if (req.file) {
+    const profilePicBuffer = fs.readFileSync(
+      'public/img/users/tempProfilePic.jpeg'
+    );
+    user = await User.findByIdAndUpdate(
+      req.user._id,
+      { photo: profilePicBuffer },
+      { new: true }
+    );
+  }
+  if (req.body.remove) {
+    user = await User.findByIdAndUpdate(
+      req.user._id,
+      { $unset: { photo: 1 } },
+      { new: true }
+    );
+  }
   res.status(200).json({
     status: 'success',
+    photo: user.photo,
   });
 });
