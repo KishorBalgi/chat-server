@@ -45,7 +45,7 @@ const userSchema = new mongoose.Schema({
 userSchema.index({ name: 'text', email: 'text' });
 // ---Middlewares--- //
 // Hide Inactive Accounts:
-userSchema.pre(/^find/, function (next) {
+userSchema.pre(/^findOne/, function (next) {
   this.find({ active: true });
   next();
 });

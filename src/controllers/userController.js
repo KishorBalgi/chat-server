@@ -54,16 +54,17 @@ exports.searchUsers = catchAsync(async (req, res, next) => {
 });
 // Delete Me:
 exports.deleteMe = catchAsync(async (req, res, next) => {
+  if (!req.params.pass) return new AppError('User password required', 400);
   const user = await User.findById(req.user._id)
     .select('+password')
     .select('+active');
-  if (!user || !(await user.checkPassword(req.body.password, user.password))) {
-    return next(new AppError('Invalid e-mail or password', 404));
+  if (!user || !(await user.checkPassword(req.params.pass, user.password))) {
+    return next(new AppError('Invalid password', 400));
   }
-  await user.update({ active: false });
+  user.active = false;
+  await user.save();
   res.status(204).json({
     status: 'success',
-    message: 'User account deleted successfully',
   });
 });
 // Update Me:

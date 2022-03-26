@@ -9,9 +9,8 @@ router.route('/searchUser').post(userController.searchUserById);
 router.route('/searchUsers').post(userController.searchUsers);
 // Delete Me:
 router
-  .route('/deleteMe')
+  .route('/deleteMe/:pass')
   .delete(authController.protect, userController.deleteMe);
-
 // Update Me:
 router
   .route('/updateMe')
