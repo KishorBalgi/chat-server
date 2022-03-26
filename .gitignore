@@ -104,3 +104,5 @@ dist
 # TernJS port file
 .tern-port
 
+# Files
+public/img/users/tempProfilePic.jpeg

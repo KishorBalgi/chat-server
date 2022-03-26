@@ -20,7 +20,7 @@ exports.resizeProfilePic = catchAsync(async (req, res, next) => {
   await sharp(req.file.buffer)
     .resize(500, 500)
     .toFormat('jpeg')
-    .jpeg({ quality: 100 })
+    .jpeg({ quality: 80 })
     .toFile(`public/img/users/${req.file.filename}`);
   next();
 });
