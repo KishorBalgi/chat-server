@@ -7,7 +7,7 @@ const chatsSchema = new mongoose.Schema({
     unique: [true, 'A chat room must be unique'],
   },
   users: [{ type: mongoose.Schema.ObjectId, ref: 'Users' }],
-  chats: [{ type: mongoose.Schema.ObjectId, ref: 'UserChat' }],
+  chats: [{ type: mongoose.Schema.ObjectId, ref: 'ChatChunk' }],
   lastUpdated: {
     type: Date,
   },
@@ -21,6 +21,7 @@ chatsSchema.pre('findOneAndUpdate', function (next) {
 chatsSchema.pre(/^findOne/, function (next) {
   this.populate({
     path: 'chats',
+    select: 'chats timestamp',
   }).populate({
     path: 'users',
     select: 'name photo',
