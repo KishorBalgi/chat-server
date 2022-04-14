@@ -76,9 +76,9 @@ io.on('connection', (socket) => {
   // Send message:
   socket.on('send-message', async (msg, room, toId) => {
     if (msg === '') return;
-    socketController.storeChat(msg, room, socket.uid);
     socket.to(room).emit('receive-message', msg, socket.uid);
     socket.to(toId).emit('new-message-from', socket.uid);
+    socketController.storeChat(msg, room, socket.uid);
   });
   // User Disconnect:
   socket.on('disconnect', () => {
