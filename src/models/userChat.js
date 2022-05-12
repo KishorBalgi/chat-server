@@ -6,10 +6,9 @@ const chatSchema = new mongoose.Schema({
     ref: 'Users',
     required: [true, 'A chat must belong to a user'],
   },
-  message: {
-    type: String,
-    required: [true, 'A chat must have a message'],
-  },
+  message: String,
+  file: String,
+  filetype: String,
   timestamp: {
     type: Date,
   },

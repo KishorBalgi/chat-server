@@ -3,6 +3,49 @@ const Chats = require('../models/chats');
 const UserChats = require('../models/userChat');
 const AppError = require('../utils/appErrors');
 const catchAsync = require('../utils/catchAsync');
+const path = require('path');
+const multer = require('multer');
+const { GridFsStorage } = require('multer-gridfs-storage');
+const crypto = require('crypto');
+const mongoose = require('mongoose');
+const conn = mongoose.connection;
+const Grid = require('gridfs-stream');
+
+// DB:
+const DB = process.env.DATABASE.replace(
+  '<PASSWORD>',
+  process.env.DATABASE_PASSWORD
+);
+// GridFS Stream:
+let gfs, gridfsBucket;
+conn.once('open', function () {
+  gridfsBucket = new mongoose.mongo.GridFSBucket(conn.db, {
+    bucketName: 'uploads',
+  });
+  gfs = Grid(conn.db, mongoose.mongo);
+  gfs.collection('uploads');
+});
+// Creating a GridFS Storage:
+const storage = new GridFsStorage({
+  url: DB,
+  file: (req, file) => {
+    return new Promise((resolve, reject) => {
+      crypto.randomBytes(16, (err, buf) => {
+        if (err) {
+          return reject(err);
+        }
+        const filename = buf.toString('hex') + path.extname(file.originalname);
+        const fileInfo = {
+          filename: filename,
+          bucketName: 'uploads',
+        };
+        resolve(fileInfo);
+      });
+    });
+  },
+});
+
+exports.upload = multer({ storage });
 
 // Get Chats of a user:
 exports.getChats = catchAsync(async (req, res, next) => {
@@ -80,3 +123,37 @@ exports.deleteMessage = catchAsync(async (req, res, next) => {
 //     status: 'success',
 //   });
 // });
+
+exports.uploadFile = catchAsync(async (req, res, next) => {
+  res.status(200).json({
+    status: 'success',
+    filename: req.file.filename,
+    filetype: req.file.mimetype,
+  });
+});
+
+exports.getFile = catchAsync(async (req, res, next) => {
+  gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
+    if (err)
+      return res.status(404).json({
+        status: 'error',
+        message: 'Something went wrong',
+      });
+    if (!file || file.length === 0) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'File not found',
+      });
+    }
+    res.set({
+      'Content-Type': file.mimeType,
+      'Content-Disposition': 'attachment; filename=' + file.filename,
+    });
+    const readStream = gridfsBucket.openDownloadStream(file._id);
+
+    readStream.on('error', function (err) {
+      res.end();
+    });
+    readStream.pipe(res);
+  });
+});

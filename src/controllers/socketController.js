@@ -18,9 +18,15 @@ exports.joinRoom = catchAsync(async (user1, user2) => {
 });
 
 // Store chat to DB:
-exports.storeChat = catchAsync(async (msg, room, id) => {
+exports.storeChat = catchAsync(async (data, room, id) => {
   const today = new Date().toLocaleDateString();
-  const chat = await UserChat.create({ user: id, message: msg });
+  const chatData = { user: id };
+  if (data.msg) chatData.message = data.msg;
+  else if (data.file) {
+    chatData.file = data.file;
+    chatData.filetype = data.filetype;
+  } else return;
+  const chat = await UserChat.create(chatData);
   let chunk = await ChatChunk.findOne({ room: room, timestamp: today });
   if (!chunk) chunk = await ChatChunk.create({ room: room, timestamp: today });
   chunk.chats.push(chat._id);

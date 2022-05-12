@@ -1,4 +1,4 @@
-const app = require('./app');
+const app = require('./app').app;
 const http = require('http');
 const server = http.createServer(app);
 const { Server } = require('socket.io');
@@ -9,31 +9,14 @@ const io = new Server(server, {
   },
 });
 
-const dotenv = require('dotenv');
-const mogoose = require('mongoose');
 const authController = require('./src/controllers/authController');
 const socketController = require('./src/controllers/socketController');
-
-// Config.env:
-dotenv.config({ path: './config.env' });
 
 process.on('uncaughtException', (err) => {
   console.log(err.name + ': ' + err.message);
   console.log('Error💥: Shutting down app...');
   process.exit(1);
 });
-
-// DB:
-const DB = process.env.DATABASE.replace(
-  '<PASSWORD>',
-  process.env.DATABASE_PASSWORD
-);
-mogoose
-  .connect(DB, {
-    useNewUrlParser: true,
-  })
-  .then(() => console.log('Database connection successful!'))
-  .catch((err) => console.log(err));
 
 // Socket:
 // Auth:
@@ -74,11 +57,11 @@ io.on('connection', (socket) => {
     cb(room);
   });
   // Send message:
-  socket.on('send-message', async (msg, room, toId) => {
-    if (msg === '') return;
-    socket.to(room).emit('receive-message', msg, socket.uid);
+  socket.on('send-message', async (data, room, toId) => {
+    if (data.msg === '' && !data.file) return;
+    socket.to(room).emit('receive-message', data, socket.uid);
     socket.to(toId).emit('new-message-from', socket.uid);
-    socketController.storeChat(msg, room, socket.uid);
+    socketController.storeChat(data, room, socket.uid);
   });
   // User Disconnect:
   socket.on('disconnect', () => {

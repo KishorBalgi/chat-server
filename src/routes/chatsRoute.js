@@ -13,7 +13,19 @@ router
   .route('/deleteMessage/:recId/:msgId')
   .delete(authController.protect, chatsController.deleteMessage);
 
+router
+  .route('/uploadFile')
+  .post(
+    authController.protect,
+    chatsController.upload.single('file'),
+    chatsController.uploadFile
+  );
+
+router
+  .route('/file/:filename')
+  .get(authController.protect, chatsController.getFile);
 // router
 //   .route('/deleteChat')
 //   .delete(authController.protect, chatsController.deleteChatFormChatList);
+
 module.exports = router;

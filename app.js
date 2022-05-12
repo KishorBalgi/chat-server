@@ -1,6 +1,11 @@
 const path = require('path');
 const express = require('express');
 const app = express();
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+// Config.env:
+dotenv.config({ path: path.resolve(__dirname + '/./config.env') });
+
 // Routers:
 const auth = require('./src/routes/authRoute');
 const user = require('./src/routes/userRoute');
@@ -17,6 +22,22 @@ const hpp = require('hpp');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const compression = require('compression');
+
+// DB:
+const DB = process.env.DATABASE.replace(
+  '<PASSWORD>',
+  process.env.DATABASE_PASSWORD
+);
+
+mongoose
+  .connect(DB, {
+    useNewUrlParser: true,
+  })
+  .then(() => {
+    console.log('Database connection successful!');
+  })
+  .catch((err) => console.log(err));
+
 // Middlewares:
 // Trust proxies:
 app.enable('trust proxy');
@@ -66,6 +87,7 @@ app.get('/', (req, res) => {
     `<h1>This is a server for Chatter - messaging application</h1><a href="https://chatter-app-client.herokuapp.com">Chatter Application</a>`
   );
 });
+
 // User Auth:
 app.use('/api/v1/user/auth', auth);
 
@@ -74,7 +96,6 @@ app.use('/api/v1/user', user);
 
 // Chats:
 app.use('/api/v1/chats', chats);
-
 // Unhandled Routes:
 app.all('*', (req, res, next) => {
   next(
@@ -84,4 +105,4 @@ app.all('*', (req, res, next) => {
 
 app.use(errorHandler.globalErrorHandler);
 
-module.exports = app;
+exports.app = app;
