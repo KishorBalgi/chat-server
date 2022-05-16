@@ -16,6 +16,8 @@ The server is built using:
 ### API
 The API is tested and documented using [Postman](https://www.postman.com/)
  - [API Documentation](https://documenter.getpostman.com/view/18487080/UyxjHSHK)
+### Front End
+ - [Front End Repo](https://github.com/KishorBalgi/chat-client)
 ### App Demo
 
 ### Author
