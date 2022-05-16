@@ -21,9 +21,7 @@ router
     chatsController.uploadFile
   );
 
-router
-  .route('/file/:filename')
-  .get(authController.protect, chatsController.getFile);
+router.route('/file/:filename').get(chatsController.getFile);
 // router
 //   .route('/deleteChat')
 //   .delete(authController.protect, chatsController.deleteChatFormChatList);

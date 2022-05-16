@@ -79,6 +79,10 @@ app.use((req, res, next) => {
   );
   next();
 });
+
+// View Engine:
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'));
 // Static:
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', (req, res) => {

@@ -11,7 +11,8 @@ router.route('/isLoggedIn').get(authController.isLoggedIn);
 // Forgot Password:
 router.route('/forgotPassword').post(authController.forgotPassword);
 // Reset Password:
-router.route('/resetPassword/:token').patch(authController.resetPassword);
+router.route('/resetPassword/:token').get(authController.resetPassword);
+router.route('/resetPassword/:id').patch(authController.resetUserPassword);
 // Update Password:
 router
   .route('/updatePassword')
