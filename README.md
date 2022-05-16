@@ -19,5 +19,5 @@ The API is tested and documented using [Postman](https://www.postman.com/)
 ### App Demo
 
 ### Author
-[Kishor Balgi](https://github.com/KishorBalgi)
-[Portfolio](https://kishorbalgi.netlify.app/)
+- [Kishor Balgi](https://github.com/KishorBalgi)
+- [My Portfolio](https://kishorbalgi.netlify.app/)
