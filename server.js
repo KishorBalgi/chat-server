@@ -4,7 +4,7 @@ const server = http.createServer(app);
 const { Server } = require('socket.io');
 const io = new Server(server, {
   cors: {
-    origin: ['https://chit-chat-client.herokuapp.com', 'http://localhost:3000'],
+    origin: ['https://chat-client-kb.herokuapp.com', 'http://localhost:3000'],
     methods: ['GET', 'POST'],
   },
 });
