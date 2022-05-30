@@ -13,7 +13,7 @@ if (btnPassReset) {
       }
     ).then((res) => {
       if (res.status === 200)
-        window.location.replace('https://chit-chat-client.herokuapp.com/login');
+        window.location.replace('https://chat-client-kb.herokuapp.com/login');
     });
   });
 }
