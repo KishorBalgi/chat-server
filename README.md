@@ -4,7 +4,7 @@
   <img src="https://i.ibb.co/jLT6LbD/Chat-Icon-PNG.png" width="100" height="100" align="center">
 <p>
     
-Repository for the server code of a chat app : [App link](www.google.com)
+Repository for the server code of a chat app : [App link](https://chat-client-kb.herokuapp.com/)
 
 Its a simple chat app where we can send text, images, videos and other file types.
 ### Server
