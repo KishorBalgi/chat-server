@@ -92,7 +92,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', (req, res) => {
   res.setHeader('Content-Type', 'text/html');
   res.end(
-    `<h1>This is a server for Chatter - messaging application</h1><a href="https://chat-client-kb.vercel.app">Chatter Application</a>`
+    `<h1>This is a server for Chatter - messaging application</h1><a href="https://chat-client-kb.vercel.app">Chat Application</a>`
   );
 });
 
