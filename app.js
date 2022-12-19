@@ -49,8 +49,8 @@ app.use(helmet());
 app.use(
   cors({
     origin: [
-      'https://chat-client-kb.herokuapp.com',
       'https://chat-client-kb.vercel.app',
+      'https://chat-client-kb.app.com',
       'http://localhost:3000',
     ],
     credentials: true,
@@ -92,7 +92,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', (req, res) => {
   res.setHeader('Content-Type', 'text/html');
   res.end(
-    `<h1>This is a server for Chatter - messaging application</h1><a href="https://chatter-app-client.herokuapp.com">Chatter Application</a>`
+    `<h1>This is a server for Chatter - messaging application</h1><a href="https://chat-client-kb.vercel.app">Chatter Application</a>`
   );
 });
 

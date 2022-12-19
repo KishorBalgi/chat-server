@@ -5,7 +5,7 @@ if (btnPassReset) {
   btnPassReset.addEventListener('click', async (e) => {
     e.preventDefault();
     fetch(
-      `https://chat-box-app-server.herokuapp.com/api/v1/user/auth/resetPassword/${userId.value}`,
+      `https://chat-server-kb.onrender.com/api/v1/user/auth/resetPassword/${userId.value}`,
       {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -13,7 +13,7 @@ if (btnPassReset) {
       }
     ).then((res) => {
       if (res.status === 200)
-        window.location.replace('https://chat-client-kb.herokuapp.com/login');
+        window.location.replace('https://chat-client-kb.vercel.app/login');
     });
   });
 }
