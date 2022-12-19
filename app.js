@@ -50,7 +50,7 @@ app.use(
   cors({
     origin: [
       'https://chat-client-kb.vercel.app',
-      'https://chat-client-kb.app.com',
+      'https://chat-client-kb.herokuapp.com',
       'http://localhost:3000',
     ],
     credentials: true,
