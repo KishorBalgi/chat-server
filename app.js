@@ -48,11 +48,7 @@ app.use(helmet());
 // CORS:
 app.use(
   cors({
-    origin: [
-      'https://chat-client-kb.vercel.app',
-      'https://chat-client-kb.herokuapp.com',
-      'http://localhost:3000',
-    ],
+    origin: ['https://chat-client-kb.vercel.app', 'http://localhost:3000'],
     credentials: true,
   })
 );
@@ -91,8 +87,14 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', (req, res) => {
   res.setHeader('Content-Type', 'text/html');
+  res.setHeader(
+    'Access-Control-Allow-Origin',
+    'https://chat-client-kb.vercel.app'
+  );
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Headers', 'X-Requested-With');
   res.end(
-    `<h1>This is a server for Chatter - messaging application</h1><a href="https://chat-client-kb.vercel.app">Chat Application</a>`
+    `<h1>This is a server for Chat Application - messaging application</h1><a href="https://chat-client-kb.vercel.app">Chat Application</a>`
   );
 });
 
@@ -104,14 +106,6 @@ app.use('/api/v1/user', user);
 
 // Chats:
 app.use('/api/v1/chats', chats);
-
-app.use('/', (req, res) => {
-  res
-    .status(200)
-    .render(
-      "<h1>Chat Applicaton Server</h1><a href='https://chat-client-kb.vercel.app'>Chat Application</a>"
-    );
-});
 // Unhandled Routes:
 app.all('*', (req, res, next) => {
   next(
