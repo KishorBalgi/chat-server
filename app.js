@@ -104,6 +104,14 @@ app.use('/api/v1/user', user);
 
 // Chats:
 app.use('/api/v1/chats', chats);
+
+app.use('/', (req, res) => {
+  res
+    .status(200)
+    .render(
+      "<h1>Chat Applicaton Server</h1><a href='https://chat-client-kb.vercel.app'>Chat Application</a>"
+    );
+});
 // Unhandled Routes:
 app.all('*', (req, res, next) => {
   next(
