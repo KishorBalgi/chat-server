@@ -45,7 +45,12 @@ const storage = new GridFsStorage({
   },
 });
 
-exports.upload = multer({ storage });
+exports.upload = multer({
+  storage,
+  limits: {
+    fileSize: 1024 * 1024 * 5,
+  },
+});
 
 // Get Chats of a user:
 exports.getChats = catchAsync(async (req, res, next) => {
