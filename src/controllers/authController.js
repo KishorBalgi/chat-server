@@ -14,10 +14,15 @@ const signToken = (id) => {
   return token;
 };
 exports.verifyToken = async (token) => {
-  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SK);
-  // Check whether user exists:
-  const user = await User.findById(decoded.id);
-  return user;
+  try {
+    const decoded = await promisify(jwt.verify)(token, process.env.JWT_SK);
+    // Check whether user exists
+    const user = await User.findById(decoded.id);
+    return user;
+  } catch (err) {
+    new AppError('Invalid token', 401);
+    return null;
+  }
 };
 const sendToken = (user, statusCode, req, res) => {
   user.password = undefined;

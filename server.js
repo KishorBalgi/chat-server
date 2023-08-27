@@ -4,7 +4,7 @@ const server = http.createServer(app);
 const { Server } = require('socket.io');
 const io = new Server(server, {
   cors: {
-    origin: 'https://chat-client-kb.vercel.app',
+    origin: process.env.CLIENT_URL,
     methods: ['GET', 'POST'],
   },
 });

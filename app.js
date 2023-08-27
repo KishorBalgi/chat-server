@@ -48,7 +48,8 @@ app.use(helmet());
 // CORS:
 app.use(
   cors({
-    origin: 'https://chat-client-kb.vercel.app',
+    // origin: 'https://chat-client-kb.vercel.app',
+    origin: process.env.CLIENT_URL,
     credentials: true,
   })
 );
